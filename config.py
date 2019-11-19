@@ -26,6 +26,11 @@ news_data = {
     "token": token
 }
 
+update_data = {
+    "name": "Dominik",
+    "surname": "Slawkowski",
+    "team_id": None
+}
 
 # print codes and text function
 def status(response):

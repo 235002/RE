@@ -16,6 +16,7 @@ class InnoPointPerformanceTest(TaskSet):
     # def admin_scenario(self):
     #     project_id = self.create_project(config.project_data)
     #     self.verify_project(project_id)
+    #
     #     self.delete_project(project_id)
 
     @task(1)
@@ -23,16 +24,14 @@ class InnoPointPerformanceTest(TaskSet):
         project_id = self.create_project(config.project_data)
         self.verify_project(project_id)
 
-        team_id = self.create_team()
+        team_id = self.create_team(config.team_data)
         self.post_news()
 
-        self.join_team(team_id)
-        self.join_project()
+        self.join_project(project_id)
 
         self.leave_project(project_id)
-        self.leave_team(config.user_id, config.update_data)
+        self.leave_team(team_id)
 
-        self.delete_team(team_id)
         self.delete_project(project_id)
 
     def create_project(self, project_data):
@@ -44,41 +43,24 @@ class InnoPointPerformanceTest(TaskSet):
     def verify_project(self, project_id=1):
         self.client.put("/projects/verify/{0}".format(project_id), {"token": config.token})
 
-    def create_team(self):
-        team_data = {"team": {
-                "open": 1,
-                "max_number_of_members": 6,
-                "token": config.token
-            }
-        }
+    def create_team(self, team_data):
         response = self.client.post("/teams", json=team_data)
         config.status(response)
-        response = json.loads(response.text)
-        return response[0]['team_id']
+        return int(response.text)
 
     def post_news(self):
         response = self.client.post("/news", config.news_data)
         config.status(response)
 
-    def join_team(self, team_id=1):
-        response = self.client.put("/teams/{0}/join".format(team_id), {"token": config.token})
-        config.status(response)
-
     def join_project(self, project_id=1):
-        response = self.client.put("/project/{0}/apply".format(project_id), {"token": config.token})
+        response = self.client.put("/projects/apply/{0}".format(project_id), {"token": config.token})
         config.status(response)
 
     def leave_project(self, project_id):
         response = self.client.put("/projects/{0}/leave".format(project_id), {"token": config.token})
         config.status(response)
 
-    def leave_team(self, user_id, update_data):
-        update_data = json.dumps(update_data)
-        print(update_data)
-        response = self.client.put("/users/{0}".format(user_id), json=update_data)
-        config.status(response)
-
-    def delete_team(self, team_id):
+    def leave_team(self, team_id):
         response = self.client.delete("/teams/{0}".format(team_id))
         config.status(response)
 

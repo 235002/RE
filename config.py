@@ -9,13 +9,21 @@ project_data = {
             "name": "Performance Testing",
             "short_description": "Prepare performance tests for web application.",
             "long_description": "Vulputate odio ut enim blandit volutpat maecenas",
-            "number_of_members": 5,
+            "number_of_members": 1,
             "technology": "Python, Locust",
             "tags": "WebDev, WebTest",
             "requirements": "none",
             "theme_color": "#3f51b5",
             "verified": 1},
     "token": token
+}
+
+team_data = {
+    "team": {
+        "open": 1,
+        "max_number_of_members": 1,
+        "token": token
+    }
 }
 
 news_data = {
@@ -31,6 +39,7 @@ update_data = {
     "surname": "Slawkowski",
     "team_id": None
 }
+
 
 # print codes and text function
 def status(response):

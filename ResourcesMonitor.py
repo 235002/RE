@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 class ResourcesMonitor:
     def __init__(self, port=3030, pid=-1):
         self.port = port
@@ -13,9 +14,8 @@ class ResourcesMonitor:
 
     def get_pid(self):
         processes = os.popen('netstat -aon | find "{0}"'.format(self.port)).read()
-        # self.pid = int(processes[155:-1])
-        # return self.pid
-        return processes
+        self.pid = int(processes[155:-1])
+        return self.pid
 
     def set_pid(self, pid):
         self.pid = pid
@@ -88,21 +88,21 @@ class ResourcesMonitor:
 
 if __name__ == "__main__":
     rm = ResourcesMonitor(port=3030)
-    # df = rm.prepare_data("admin_cpu_memory_stats.json")
-    # rm.memory_plot(df)
-    # rm.cpu_plot(df)
-    # rm.cpu_plot2(df)
-    rm.set_pid(12984)
-    rm.create_process()
-
-    history = []
-
-    try:
-            while True:
-                data = rm.monitor()
-                history.append(data)
-                time.sleep(0.2)
-    except KeyboardInterrupt:
-        with open('admin_cpu_memory_stats.json', 'w') as file:
-            json.dump(history, file)
-        exit(0)
+    df = rm.prepare_data("all_reqs.json")
+    rm.memory_plot(df)
+    rm.cpu_plot(df)
+    rm.cpu_plot2(df)
+    # rm.set_pid(12984)
+    # rm.create_process()
+    #
+    # history = []
+    #
+    # try:
+    #         while True:
+    #             data = rm.monitor()
+    #             history.append(data)
+    #             time.sleep(0.2)
+    # except KeyboardInterrupt:
+    #     with open('all_reqs.json', 'w') as file:
+    #         json.dump(history, file)
+    #     exit(0)

@@ -2,7 +2,8 @@ import psutil
 import os
 import json
 import time
-
+import pandas as pd
+import matplotlib.pyplot as plt
 
 class ResourcesMonitor:
     def __init__(self, port=3030, pid=-1):
@@ -12,8 +13,12 @@ class ResourcesMonitor:
 
     def get_pid(self):
         processes = os.popen('netstat -aon | find "{0}"'.format(self.port)).read()
-        self.pid = int(processes[155:-1])
-        return self.pid
+        # self.pid = int(processes[155:-1])
+        # return self.pid
+        return processes
+
+    def set_pid(self, pid):
+        self.pid = pid
 
     def create_process(self):
         if psutil.pid_exists(self.pid):
@@ -36,10 +41,58 @@ class ResourcesMonitor:
         }
         return data
 
+    @staticmethod
+    def prepare_data(file_name):
+        with open(file_name, 'r') as file:
+            data = json.load(file)
+            df = pd.DataFrame.from_dict(data, orient='columns')
+
+            time_list = []
+            for index, item in df.iterrows():
+                time_list.append(index/5)
+            df['time'] = time_list
+        return df
+
+    @staticmethod
+    def memory_plot(df):
+        plt.figure()
+        ax = plt.gca()
+        df.plot(kind='line', x='time', y='resident_set_size', color='blue', ax=ax)
+        df.plot(kind='line', x='time', y='virtual_set_size', color='red', ax=ax)
+        ax.set_title('Memory usage')
+        ax.set_xlabel('Time [s]')
+        ax.set_ylabel('Memory [B]')
+        plt.show()
+
+    @staticmethod
+    def cpu_plot(df):
+        plt.figure()
+        ax = plt.gca()
+        df.plot(kind='line', x='time', y='user_time', color='red', ax=ax)
+        df.plot(kind='line', x='time', y='system_time', color='green', ax=ax)
+        ax.set_title('Time of CPU usage')
+        ax.set_xlabel('Time [s]')
+        ax.set_ylabel('CPU')
+        plt.show()
+
+    @staticmethod
+    def cpu_plot2(df):
+        plt.figure()
+        ax = plt.gca()
+        df.plot(kind='line', x='time', y='cpu_percent', color='blue', ax=ax)
+        ax.set_title('Percentage of CPU usage')
+        ax.set_xlabel('Time [s]')
+        ax.set_ylabel('CPU')
+        plt.show()
+
 
 if __name__ == "__main__":
     rm = ResourcesMonitor(port=3030)
-    rm.get_pid()
+    # df = rm.prepare_data("admin_cpu_memory_stats.json")
+    # rm.memory_plot(df)
+    # rm.cpu_plot(df)
+    # rm.cpu_plot2(df)
+    rm.set_pid(12984)
     rm.create_process()
 
     history = []
@@ -50,6 +103,6 @@ if __name__ == "__main__":
                 history.append(data)
                 time.sleep(0.2)
     except KeyboardInterrupt:
-        with open('cpu_memory_stats.json', 'w') as file:
+        with open('admin_cpu_memory_stats.json', 'w') as file:
             json.dump(history, file)
         exit(0)

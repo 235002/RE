@@ -12,27 +12,26 @@ class InnoPointPerformanceTest(TaskSet):
         response = self.client.put("/user", {"token": config.token})
         config.status(response)
 
+    @task(1)
+    def admin_scenario(self):
+        project_id = self.create_project(config.project_data)
+        self.verify_project(project_id)
+        self.delete_project(project_id)
+
     # @task(1)
-    # def admin_scenario(self):
+    # def user_scenario(self):
     #     project_id = self.create_project(config.project_data)
     #     self.verify_project(project_id)
     #
+    #     team_id = self.create_team(config.team_data)
+    #     self.post_news()
+    #
+    #     self.join_project(project_id)
+    #
+    #     self.leave_project(project_id)
+    #     self.leave_team(team_id)
+    #
     #     self.delete_project(project_id)
-
-    @task(1)
-    def user_scenario(self):
-        project_id = self.create_project(config.project_data)
-        self.verify_project(project_id)
-
-        team_id = self.create_team(config.team_data)
-        self.post_news()
-
-        self.join_project(project_id)
-
-        self.leave_project(project_id)
-        self.leave_team(team_id)
-
-        self.delete_project(project_id)
 
     def create_project(self, project_data):
         response = self.client.post("/projects", json=project_data)

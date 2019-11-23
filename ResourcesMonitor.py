@@ -4,6 +4,9 @@ import json
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
+import csv
+import re
+# pd.set_option('display.max_rows', None)
 
 
 class ResourcesMonitor:
@@ -84,19 +87,54 @@ class ResourcesMonitor:
         ax.set_xlabel('Time [s]')
         ax.set_ylabel('CPU')
         plt.show()
+        
+    @staticmethod
+    def csv_reader(file_name):
+        data = []
+        csv.register_dialect('myDialect',
+                             delimiter=',',
+                             quoting=csv.QUOTE_ALL,
+                             skipinitialspace=True)
+        with open(file_name, 'r') as file:
+            reader = csv.DictReader(file, dialect='myDialect')
+            for row in reader:
+                data.append(dict(row))
+        df = pd.DataFrame.from_dict(data, orient='columns')
+        return df
+
+    @staticmethod
+    def data_operations(df):
+        df.sort_values(by='Name', ascending=False)
+        for index, row in df.iterrows():
+            row['Name'] = ''.join([i for i in row['Name'] if not i.isdigit()])
+
+        df['# requests'] = df['# requests'].astype(float)
+        df['# failures'] = df['# failures'].astype(float)
+        df['Median response time'] = df['Median response time'].astype(float)
+        df['Average response time'] = df['Average response time'].astype(float)
+        df['Min response time'] = df['Min response time'].astype(float)
+        df['Max response time'] = df['Max response time'].astype(float)
+        df['Average Content Size'] = df['Average Content Size'].astype(float)
+        df['Requests/s'] = df['Requests/s'].astype(float)
+
+        x = df.groupby(['Method', 'Name'], as_index=False).mean() # .sort_values(by=['Name', 'Method'])
+        print(x)
 
 
 if __name__ == "__main__":
     rm = ResourcesMonitor(port=3030)
-    df = rm.prepare_data("all_reqs.json")
-    rm.memory_plot(df)
-    rm.cpu_plot(df)
-    rm.cpu_plot2(df)
+    data = rm.csv_reader('req_all.csv')
+    rm.data_operations(data)
+
+    # df = rm.prepare_data("all_reqs.json")
+    # rm.memory_plot(df)
+    # rm.cpu_plot(df)
+    # rm.cpu_plot2(df)
+
+
     # rm.set_pid(12984)
     # rm.create_process()
-    #
     # history = []
-    #
     # try:
     #         while True:
     #             data = rm.monitor()

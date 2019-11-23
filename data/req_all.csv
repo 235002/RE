@@ -1,0 +1,12 @@
+"Method","Name","# requests","# failures","Median response time","Average response time","Min response time","Max response time","Average Content Size","Requests/s"
+"POST","/news",216,3,11000,13486,38,60190,1,0.63
+"POST","/projects",107,2,9400,11278,474,50879,240,0.31
+"PUT","/projects",410,4,7000,8834,379,58640,516074,1.19
+"GET","/projects/1",389,5,6800,8374,39,41258,1533,1.13
+"POST","/teams",318,3,9100,11500,265,53534,3,0.92
+"PUT","/teams",327,3,7400,8775,179,51796,122932,0.95
+"PUT","/teams/2/status",203,5,6700,8686,39,52499,1,0.59
+"GET","/teams/3",445,7,7700,8877,23,49230,75,1.29
+"PUT","/user",657,7,5500,6723,10,48728,276,1.90
+"PUT","/users",421,3,6300,7913,46,45485,2119,1.22
+"None","Aggregated",3493,42,7200,8871,10,60190,72579,10.11
